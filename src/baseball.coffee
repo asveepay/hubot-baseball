@@ -42,7 +42,7 @@ module.exports = (robot) =>
         return 0
 
       emit = []
-      emit.push("For #{today.format('YYY-MM-DD')}")
+      emit.push("For #{today.format('YYYY-MM-DD')}")
       for game in games
         awayTeamName = game.away_team_name
         homeTeamName = game.home_team_name

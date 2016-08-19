@@ -20,8 +20,10 @@ module.exports = (robot) =>
     if days
       if msg.match[2].match(/\+/)
         today = moment().add(days, 'days')
+        emit.push("For #{today.format('YYY-MM-DD')}")
       else
         today = moment().subtract(days, 'days')
+        emit.push("For #{today.format('YYY-MM-DD')}")
     else
       today = moment()
 
@@ -89,7 +91,7 @@ module.exports = (robot) =>
 
             gameLinescore = linescoreHeader.join(' | ') + " ‖ R | H | E | Status \n"
             gameLinescore += awayTeamName + " | " + inningScores.away.join(' | ') + " ‖ #{runs.away} | #{hits.away} | #{errors.away} | #{status.ind} #{status.inning}\n"
-            gameLinescore += homeTeamName + " | " + inningScores.home.join(' | ') + " ‖ #{runs.home} | #{hits.home} | #{errors.home}"
+            gameLinescore += homeTeamName + " | " + inningScores.home.join(' | ') + " ‖ #{runs.home} | #{hits.home} | #{errors.home} | "
 
             emit.push("```#{gameLinescore}```");
         else

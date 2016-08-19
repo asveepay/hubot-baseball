@@ -20,10 +20,8 @@ module.exports = (robot) =>
     if days
       if msg.match[2].match(/\+/)
         today = moment().add(days, 'days')
-        emit.push("For #{today.format('YYY-MM-DD')}")
       else
         today = moment().subtract(days, 'days')
-        emit.push("For #{today.format('YYY-MM-DD')}")
     else
       today = moment()
 
@@ -44,6 +42,7 @@ module.exports = (robot) =>
         return 0
 
       emit = []
+      emit.push("For #{today.format('YYY-MM-DD')}")
       for game in games
         awayTeamName = game.away_team_name
         homeTeamName = game.home_team_name

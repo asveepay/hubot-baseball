@@ -14,11 +14,18 @@
 moment = require 'moment'
 
 module.exports = (robot) =>
-  robot.respond /baseball( (.*))?/i, (msg) ->
+  robot.respond /baseball( \w*)?( [+\-]?[0-9]+)?/i, (msg) ->
     team = if msg.match[1] then msg.match[1].toUpperCase().trim() else false
-    today = moment()
+    days = if msg.match[2] then msg.match[2].split(/[\+\-]/)[1] else false
+    if days
+      if msg.match[2].match(/\+/)
+        today = moment().add(days, 'days')
+      else
+        today = moment().subtract(days, 'days')
+    else
+      today = moment()
 
-    url = "http://gd2.mlb.com/components/game/mlb/year_#{today.format('YYYY')}/month_#{today.format('MM')}/day_#{today.format('DD')}/master_scoreboard.json"
+    url = "http://gd2.mlb.com/components/game/mlb/year_#{today.format('YYYY')}/month_#{today.format('MM')}/day_#{(today).format('DD')}/master_scoreboard.json"
     msg.http(url).get() (err, res, body) ->
       return msg.send "Unable to pull today's scoreboard. ERROR:#{err}" if err
       return msg.send "Unable to pull today's scoreboard: #{res.statusCode + ':\n' + body}" if res.statusCode != 200
@@ -41,10 +48,11 @@ module.exports = (robot) =>
 
         if game.linescore
           linescore = game.linescore
+          status = game.status
 
           if displayGame(game, team)
             if !team
-              emit.push("#{awayTeamName} (#{linescore.r.away}) vs #{homeTeamName} (#{linescore.r.home}) @ #{game.venue}")
+              emit.push("#{awayTeamName} (#{linescore.r.away}) vs #{homeTeamName} (#{linescore.r.home}) @ #{game.venue} #{status.ind} #{status.inning}")
               continue
 
             runs = linescore.r
@@ -79,8 +87,8 @@ module.exports = (robot) =>
                 inningScores.away.push(if inning.away then inning.away else ' ')
                 inningScores.home.push(if inning.home then inning.home else ' ')
 
-            gameLinescore = linescoreHeader.join(' | ') + " ‖ R | H | E\n"
-            gameLinescore += awayTeamName + " | " + inningScores.away.join(' | ') + " ‖ #{runs.away} | #{hits.away} | #{errors.away}\n"
+            gameLinescore = linescoreHeader.join(' | ') + " ‖ R | H | E | Status \n"
+            gameLinescore += awayTeamName + " | " + inningScores.away.join(' | ') + " ‖ #{runs.away} | #{hits.away} | #{errors.away} | #{status.ind} #{status.inning}\n"
             gameLinescore += homeTeamName + " | " + inningScores.home.join(' | ') + " ‖ #{runs.home} | #{hits.home} | #{errors.home}"
 
             emit.push("```#{gameLinescore}```");

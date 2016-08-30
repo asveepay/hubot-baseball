@@ -69,9 +69,9 @@ module.exports = (robot) =>
               inningScores.away.push(if linescore.inning.away then linescore.inning.away else ' ')
               inningScores.home.push(if linescore.inning.home then linescore.inning.home else ' ')
             else
-              for inning in linescore.inning
-                inningScores.away.push(if inning.away then inning.away else ' ')
-                inningScores.home.push(if inning.home then inning.home else ' ')
+              for inning, i in linescore.inning
+                inningScores.away.push(if inning.away then padInningScore(inning.away, i+1) else ' ')
+                inningScores.home.push(if inning.home then padInningScore(inning.home, i+1) else ' ')
 
             linescoreHeader = []
             linescoreHeader.push(Array(longestTeamName(awayTeamName, homeTeamName).length + 1).join(' '))
@@ -113,6 +113,12 @@ padTeamName = (team1, team2) ->
     return team1 + Array((team2.length - team1.length) + 1).join(' ')
   else
     return team1
+
+padInningScore = (score, inning) ->
+  if inning > 9
+    return " "+score
+  else
+    return score
 
 displayGame = (game, team) ->
   if !team || (team && game.home_name_abbrev == team || game.away_name_abbrev == team)

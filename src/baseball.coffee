@@ -12,7 +12,7 @@
 # Author:
 #   jonursenbach
 
-moment = require 'moment'
+moment = require 'moment-timezone'
 
 module.exports = (robot) =>
   robot.respond /baseball( \w*)?( [+\-]?[0-9]+)?/i, (msg) ->
@@ -113,8 +113,8 @@ module.exports = (robot) =>
               if linescoreHeader.length < 10
                 for num in [linescoreHeader.length...10]
                   linescoreHeader.push(num);
-                  inningScores.away.push(if inning.away then inning.away else ' ')
-                  inningScores.home.push(if inning.home then inning.home else ' ')
+                  inningScores.away.push(if linescore.inning.away then linescore.inning.away else ' ')
+                  inningScores.home.push(if linescore.inning.home then linescore.inning.home else ' ')
 
               gameLinescore = linescoreHeader.join(' | ') + " ‖ R | H | E | Status \n"
               gameLinescore += awayTeamName + " | " + inningScores.away.join(' | ') + " ‖ #{runs.away} | #{hits.away} | #{errors.away} | #{status.ind} #{status.inning}\n"
@@ -123,12 +123,17 @@ module.exports = (robot) =>
               emit.push("```#{gameLinescore}```");
           else
             if displayGame(game, team)
-              emit.push("#{awayTeamName} vs #{homeTeamName} @ #{game.venue} #{game.time}")
+              emit.push("#{awayTeamName} vs #{homeTeamName} @ #{game.venue} #{localTime(game)}")
 
         if emit.length >= 1
           return msg.send emit.join("\n")
 
         msg.send "Sorry, I couldn't find any games today for #{team}."
+
+localTime = (game) ->
+  game_time_est   = moment.tz(game.time_date+game.ampm, "YYYY/MM/DD h:mmA", "America/New_York" )
+  game_time_local = moment(game_time_est).tz(moment.tz.guess())
+  return game_time_local.format("hh:mm A z") 
 
 longestTeamName = (away, home) ->
   if away.length > home.length

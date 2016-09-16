@@ -17,6 +17,7 @@
   },
   "main": "index.coffee",
   "dependencies": {
-    "moment": "^2.6.0"
+    "moment": "^2.6.0",
+    "moment-timezone": "^0.5.5"
   }
 }

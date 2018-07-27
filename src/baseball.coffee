@@ -19,7 +19,7 @@ module.exports = (robot) =>
     if msg.match[1] && msg.match[1].toLowerCase().trim() == 'standings'
       today = moment()
 
-      url = "http://mlb.mlb.com/lookup/json/named.standings_schedule_date.bam?season=#{today.format('YYYY')}&schedule_game_date.game_date='#{today.format('YYYY')}/#{today.format('MM')}/#{today.format('DD')}'&sit_code='h0'&league_id=103&league_id=104&all_star_sw='N'&version=2"
+      url = "http://lookup-service-prod.mlb.com/lookup/json/named.standings_schedule_date.bam?season=#{today.format('YYYY')}&schedule_game_date.game_date='#{today.format('YYYY')}/#{today.format('MM')}/#{today.format('DD')}'&sit_code='h0'&league_id=103&league_id=104&all_star_sw='N'&version=2"
       msg.http(url).get() (err, res, body) ->
         return msg.send "Unable to pull today's standings. ERROR:#{err}" if err
         return msg.send "Unable to pull today's standings: #{res.statusCode + ':\n' + body}" if res.statusCode != 200

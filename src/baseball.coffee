@@ -81,7 +81,7 @@ module.exports = (robot) =>
 
             if displayGame(game, team)
               if !team
-                emit.push("#{awayTeamName} (#{linescore.r.away}) vs #{homeTeamName} (#{linescore.r.home}) @ #{game.venue} #{status.ind} #{status.inning}")
+                emit.push("#{awayTeamName} (#{linescore.r.away}) vs #{homeTeamName} (#{linescore.r.home}) @ #{game.venue} #{status.ind} #{topBottomInning(status.top_inning)}#{status.inning}")
                 continue
 
               runs = linescore.r
@@ -92,8 +92,8 @@ module.exports = (robot) =>
               awayTeamName = padTeamName(game.away_team_name, game.home_team_name)
               homeTeamName = padTeamName(game.home_team_name, game.away_team_name)
 
-              # If the game is just in the first inning, linecsore.home is an array. Past the first it becomes an array.
-              if typeof linescore.inning.home != 'undefined' || typeof linescore.inning.away != 'undefined'
+              # If the game is just in the first inning, linescore.inning is an object {away: "0", home: "1"}. Past the first it becomes an array.
+              if typeof linescore.inning == 'object' && linescore.inning.constructor == Object
                 inningScores.away.push(if linescore.inning.away then linescore.inning.away else ' ')
                 inningScores.home.push(if linescore.inning.home then linescore.inning.home else ' ')
               else
@@ -117,7 +117,7 @@ module.exports = (robot) =>
                   inningScores.home.push(if linescore.inning.home then linescore.inning.home else ' ')
 
               gameLinescore = linescoreHeader.join(' | ') + " ‖ R | H | E | Status \n"
-              gameLinescore += awayTeamName + " | " + inningScores.away.join(' | ') + " ‖ #{runs.away} | #{hits.away} | #{errors.away} | #{status.ind} #{status.inning}\n"
+              gameLinescore += awayTeamName + " | " + inningScores.away.join(' | ') + " ‖ #{runs.away} | #{hits.away} | #{errors.away} | #{status.ind} #{topBottomInning(status.top_inning)}#{status.inning}\n"
               gameLinescore += homeTeamName + " | " + inningScores.home.join(' | ') + " ‖ #{runs.home} | #{hits.home} | #{errors.home} | "
 
               emit.push("```#{gameLinescore}```");
@@ -158,3 +158,9 @@ displayGame = (game, team) ->
     return true
 
   return false
+
+topBottomInning = (top_inning) ->
+  if top_inning == "N"
+    return "\u25be"
+  else
+    return "\u25b4"
